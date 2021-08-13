@@ -17,8 +17,7 @@ class ThreadBotHelpers {
             type: 'USER',
             permission: true,
         }];
-        let configCommand = await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === 'config')
-            .catch(console.error);
+        let configCommand = await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === 'config');
     
         await this.getRolesByPermission(context.guild, managerRoles, 'MANAGE_GUILD');
 
