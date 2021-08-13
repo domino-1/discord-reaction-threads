@@ -49,7 +49,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
-    let threadName;
+    let threadName = "thread";
     if (reaction.message.channel.type === 'GUILD_NEWS') {
         threadName = config.guilds[reaction.message.guild.id].newsthreadname;
     } else {
@@ -57,7 +57,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     if (reaction.emoji.name === "🧵" && reaction.count >= config.guilds[reaction.message.guild.id].reactions && reaction.message.thread == null) {
-        reaction.message.startThread(threadName, config.guilds[reaction.message.guild.id].archivetime)
+        reaction.message.startThread({name: `${threadName}`, autoArchiveThreads: config.guilds[reaction.message.guild.id].archivetime })
             .then(async newThread => {
                 await reaction.users.fetch()
                     .then(reacters => reacters.each(user => {
@@ -179,7 +179,7 @@ client.on('messageCreate', async message => {
         console.log(commands);
     }
 
-    if (message.content.toLowerCase() === '!setup' && ( await message.member.permissions.has('MANAGE_GUILD').then().catch(console.error) )) {
+    if (message.content.toLowerCase() === '!setup' && ( await message.member.permissions.has('MANAGE_GUILD') )) {
         //sets up config command permissions
         helpers.setConfigPerms(message);
 
