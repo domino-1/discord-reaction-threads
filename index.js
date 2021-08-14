@@ -322,4 +322,4 @@ client.on('interactionCreate', async interaction => {
 
 });
 
-client.login(/*process.env.TOKEN*/'ODc1ODMxNTg0NDM4MjQzMzQ5.YRbPuQ.r73FT8E7xHAxRhRlrjmxtbpMPF4');
+client.login(process.env.TOKEN);
