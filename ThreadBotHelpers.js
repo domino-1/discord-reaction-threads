@@ -10,33 +10,30 @@ class ThreadBotHelpers {
         .catch(console.error);
     }
 
-    async setConfigPerms(context) {
-        let managerRoles = [];
-        let permissions = [{
-            id: '241901692298330112',
-            type: 'USER',
-            permission: true,
-        }];
-        let configCommand = await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === 'config');
-    
-        await this.getRolesByPermission(context.guild, managerRoles, 'MANAGE_GUILD');
+    async setCommandPerms(context, target, permission) {
+        let roles = [];
+        let permissions = [];
+        let command = await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === `${target}`);
+        
+        await this.getRolesByPermission(context.guild, roles, permission);
 
-        let permissionChange = false
-        managerRoles.forEach(async elem => { permissions.push({
+        roles.forEach(elem => {
+            permissions.push(
+                {
                 id: `${elem}`,
-                type: 'ROLE',
                 permission: true,
-                })
-
-                if (await configCommand.permissions.has({permissionId:`${elem}`}).then().catch(console.error)) {
-                    permissionChange = true;
+                type: 'ROLE',
                 }
-            });
+            );
+        });
 
-        if (permissionChange) {
-            await configCommand.permissions.add({ permissions });
-            console.log('Perms set.')
+        let oldPerms = await command.permissions.fetch()
+            .catch(console.error);
+        if (oldPerms.length != permissions.length) {
+            await command.permissions.set({ permissions });
+            console.log("Perms updated");
         }
+        
     }
 
 }

@@ -12,13 +12,16 @@ module.exports = {
         
             await inputInter.channel.parent.messages.fetch(threadID)
                 .then(async msg => {
-                    let threadEmoji = msg.reactions.cache.get("🧵");
-        
-                    await threadEmoji.users.fetch()
+                    let threadEmoji
+                    if (msg.reactions.cache.get("🧵")) {
+                        threadEmoji = msg.reactions.cache.get("🧵");
+
+                        await threadEmoji.users.fetch()
                         .then(reacters => reacters.each(user => {
                             outputArray.push(user);
                         }))
                         .catch(console.error);
+                    }
         
                     return outputArray;
                 })
@@ -40,7 +43,7 @@ module.exports = {
         }
 
         if (interaction.channel.isThread() && interaction.channel.messageCount < 50) {
-            await interaction.defer();
+            //await interaction.defer({ephemeral: true});
             
             let oldThreadName = interaction.channel.name;
             let threadOwners = [];
@@ -49,8 +52,7 @@ module.exports = {
             if (threadOwners.includes(interaction.user)) {
                 interaction.channel.setName(`${allArgs}`)
                     .then(newThread => { 
-                        interaction.editReply({ content: `Thread name changed.`})
-                            .then(msg => console.log(`Sent message: "${msg.content}"`))
+                        interaction.reply({ content: `Thread name changed to '${interaction.channel.name}'.` })
                             .catch(console.error);
                         if ( logChannel ) {
                             logChannel.send(`Thread '${newThread.id}' name changed from "${oldThreadName}" to "${newThread.name}" by <@${interaction.user.id}>.`); 
@@ -58,18 +60,15 @@ module.exports = {
                     })
                     .catch(console.error);
             } else {
-                interaction.editReply({ content: 'You do not have permission to change the thread\'s name. Contact one of the thread\'s creators.', ephemeral: true })
-                    .then(msg => console.log(`Sent message: "${msg.content}"`))
+                interaction.reply({ content: 'You do not have permission to change the thread\'s name. Contact one of the thread\'s creators.', ephemeral: true })
                     .catch(console.error);
             }
         } else {
             if (interaction.channel.isThread()) {
                 interaction.reply({ content: 'You may only change the thread\'s name within the first 50 messages.', ephemeral: true })
-                    .then(msg => console.log(`Sent message: "${msg.content}"`))
                     .catch(console.error);
             } else {
                 interaction.reply({ content: 'The "/name" command can only be used in a thread.'})
-                    .then(msg => console.log(`Sent message: "${msg.content}"`))
                     .catch(console.error);
             }
         }

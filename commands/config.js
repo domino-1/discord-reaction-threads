@@ -9,7 +9,7 @@ module.exports = {
         const ThreadBotHelpers = require('../ThreadBotHelpers');
         let helpers = new ThreadBotHelpers();
 
-        await helpers.setConfigPerms(interaction);
+        await helpers.setCommandPerms(interaction, 'config', 'MANAGE_GUILD');
 
         const guildId = `${interaction.guild.id}`;
 

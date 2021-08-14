@@ -1,4 +1,4 @@
-const { Client, Collection, Intents } = require('discord.js');
+const { Client, Collection, Intents, MessageFlags, MessageButton, MessageActionRow } = require('discord.js');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const ThreadBotHelpers = require('./ThreadBotHelpers');
@@ -56,8 +56,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
         threadName = config.guilds[reaction.message.guild.id].threadname;
     }
 
-    if (reaction.emoji.name === "🧵" && reaction.count >= config.guilds[reaction.message.guild.id].reactions && reaction.message.thread == null) {
-        reaction.message.startThread({name: `${threadName}`, autoArchiveThreads: config.guilds[reaction.message.guild.id].archivetime })
+    if (reaction.emoji.name === "🧵" && reaction.count >= config.guilds[reaction.message.guild.id].reactions && !reaction.message.hasThread) {
+        reaction.message.startThread({name: `${threadName}`, autoArchiveDuration: config.guilds[reaction.message.guild.id].archivetime })
             .then(async newThread => {
                 await reaction.users.fetch()
                     .then(reacters => reacters.each(user => {
@@ -69,6 +69,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 }
             })
             .catch(console.error);
+    } else if (reaction.emoji.name === "🧵" && reaction.message.hasThread && !reaction.message.thread.locked) {
+        if (reaction.message.thread.archived) {
+            await reaction.message.thread.setArchived(false).catch(console.error);
+        }    
+        reaction.message.thread.members.add(user);
     }
     
 });
@@ -93,6 +98,32 @@ client.on('messageCreate', async message => {
         {
             name: 'info',
             description: 'Provides information about the bot.'
+        },
+        {
+            name: 'lthread',
+            description: 'Sets up a semi-permanent "lingering" thread trough a pinned embed.',
+            defaultPermission: false,
+            options: [
+                {
+                    name: 'create',
+                    description: 'Creates a Lingering Thread embed message, and pins it.',
+                    type: 'SUB_COMMAND',
+                    options: [
+                        {
+                            name: 'name',
+                            type: 'STRING',
+                            description: 'The thread\'s name',
+                            required: true
+                        },
+                        {
+                            name: 'description',
+                            type: 'STRING',
+                            description: 'Describes the thread. (optional)',
+                            required: false
+                        }
+                    ]
+                }
+            ]
         },
         {
             name: 'config',
@@ -181,7 +212,8 @@ client.on('messageCreate', async message => {
 
     if (message.content.toLowerCase() === '!setup' && ( await message.member.permissions.has('MANAGE_GUILD') )) {
         //sets up config command permissions
-        helpers.setConfigPerms(message);
+        await helpers.setCommandPerms(message, 'config', 'MANAGE_GUILD');
+        await helpers.setCommandPerms(message, 'lthread', 'MANAGE_GUILD');
 
         //sets up config.json file with some defaults 
         if (!config.guilds[message.guild.id]) {
@@ -197,13 +229,81 @@ client.on('messageCreate', async message => {
             fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
         }
         if (config.guilds[message.guild.id]) { 
-            setupComplete = true; 
+            setupComplete = true;
+            message.channel.send({ content: 'Setup complete.'});
             console.log('Setup complete');
         } else {
             message.channel.send({ content: 'Something went wrong. Please try again. '})
         }
     }
 });
+
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isButton()) return;
+	if (!interaction.customId === 'lingering_thread_join') return;
+    if (!interaction.message.hasThread) {
+        await interaction.message.unpin().catch(console.error);
+        const lthreadJoinButton = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('lingering_thread_join')
+                    .setLabel('Join thread')
+                    .setStyle('SUCCESS')
+                    .setEmoji('🧵')
+                    .setDisabled(true)
+            );
+        await interaction.update({ content: '⚠️ This thread was deleted ⚠️', components: [lthreadJoinButton] }).catch(console.error);
+        return;
+    }
+
+    if (!interaction.message.thread.locked) {
+        if (!interaction.message.pinned) {
+            await interaction.message.pin().catch(console.error);
+        }
+        if (!(await interaction.message.thread.members.fetch().catch(console.error)).has(interaction.user.id)) {
+            if (interaction.message.thread.archived) {
+                await interaction.message.thread.setArchived(false).catch(console.error);
+            }
+            interaction.message.thread.members.add(interaction.user);
+            await interaction.update({ content: ' ' }).catch(console.error);
+            await interaction.followUp({content: `You joined the ${interaction.message.thread.name} thread.`, ephemeral: true});
+        } else { interaction.update({}).catch(console.error); }
+    } else { 
+        await interaction.message.unpin().catch(console.error);
+        await interaction.update({ content: '🔒 This thread was locked 🔒' }).catch(console.error);
+        await interaction.followUp({ content: 'Cannot join locked threads.', ephemeral: true}).catch(console.error);
+    }
+});
+
+async function isLingeringThread(thread) {
+    let parentMessage = await thread.parent.messages.fetch(thread.id);
+    if ( parentMessage.components[0] ) {
+        if (parentMessage.components[0].components[0] ) {
+            if( parentMessage.components[0].components[0].customId === 'lingering_thread_join') {
+                return true;
+            }
+        }
+    } else {
+        return false;
+    }
+}
+
+/*client.on('threadUpdate', async (oldThread, newThread) => {
+    if (!(await isLingeringThread(oldThread))) return;
+
+    let parentMessage = await thread.parent.messages.fetch(thread.id);
+    if( newThread.locked ) {
+        const disbaledButton = new MessageButton()
+            .setCustomId('lingering_thread_join')
+            .setLabel('Join thread')
+            .setStyle('SUCCESS')
+            .setDisabled(true)
+            .setEmoji('🧵')
+
+        parentMessage.
+    }
+
+})*/
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand() || !config.guilds[interaction.guild.id]) return;
@@ -222,4 +322,4 @@ client.on('interactionCreate', async interaction => {
 
 });
 
-client.login(process.env.TOKEN);
+client.login(/*process.env.TOKEN*/'ODc1ODMxNTg0NDM4MjQzMzQ5.YRbPuQ.r73FT8E7xHAxRhRlrjmxtbpMPF4');
