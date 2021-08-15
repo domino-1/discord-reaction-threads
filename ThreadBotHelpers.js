@@ -36,6 +36,18 @@ class ThreadBotHelpers {
         
     }
 
+    async isLingeringThread(thread) {
+        const parentMessage = await thread.parent.messages.fetch(thread.id);
+        if ( parentMessage.components[0] ) {
+            if (parentMessage.components[0].components[0] ) {
+                if( parentMessage.components[0].components[0].customId === 'lingering_thread_join') {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }
 
 module.exports = ThreadBotHelpers;

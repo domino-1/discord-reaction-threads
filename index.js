@@ -38,7 +38,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
             // Return as `reaction.message.author` may be undefined/null
             return;
         }
-    } 
+    }
+    
+    if (reaction.message.channel.isThread()) return;
     
     let logChannel;
     let logging = config.guilds[reaction.message.guild.id].logging;
@@ -119,6 +121,31 @@ client.on('messageCreate', async message => {
                             name: 'description',
                             type: 'STRING',
                             description: 'Describes the thread. (optional)',
+                            required: false
+                        }
+                    ]
+                },
+                {
+                    name: 'edit',
+                    description: 'Edits an existing Lingering Thread\'s embed message.',
+                    type: 'SUB_COMMAND',
+                    options: [
+                        {
+                            name: 'thread',
+                            type: 'CHANNEL',
+                            description: 'The lingering thread to edit. You do not need this if the command is executed inside an lthread.',
+                            required: false
+                        },
+                        {
+                            name: 'name',
+                            type: 'STRING',
+                            description: 'The thread\'s new name.',
+                            required: false
+                        },
+                        {
+                            name: 'description',
+                            type: 'STRING',
+                            description: 'The thread\'s new description.',
                             required: false
                         }
                     ]
@@ -257,53 +284,50 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (!interaction.message.thread.locked) {
-        if (!interaction.message.pinned) {
-            await interaction.message.pin().catch(console.error);
-        }
         if (!(await interaction.message.thread.members.fetch().catch(console.error)).has(interaction.user.id)) {
             if (interaction.message.thread.archived) {
                 await interaction.message.thread.setArchived(false).catch(console.error);
             }
             interaction.message.thread.members.add(interaction.user);
-            await interaction.update({ content: ' ' }).catch(console.error);
-            await interaction.followUp({content: `You joined the ${interaction.message.thread.name} thread.`, ephemeral: true});
-        } else { interaction.update({}).catch(console.error); }
+            await interaction.reply({content: `You joined the ${interaction.message.thread.name} thread.`, ephemeral: true});
+        } else { 
+            interaction.update({}).catch(console.error); 
+        }
     } else { 
-        await interaction.message.unpin().catch(console.error);
-        await interaction.update({ content: '🔒 This thread was locked 🔒' }).catch(console.error);
-        await interaction.followUp({ content: 'Cannot join locked threads.', ephemeral: true}).catch(console.error);
+        await interaction.reply({ content: 'Cannot join locked threads.', ephemeral: true}).catch(console.error);
     }
 });
 
-async function isLingeringThread(thread) {
-    let parentMessage = await thread.parent.messages.fetch(thread.id);
-    if ( parentMessage.components[0] ) {
-        if (parentMessage.components[0].components[0] ) {
-            if( parentMessage.components[0].components[0].customId === 'lingering_thread_join') {
-                return true;
-            }
+client.on('threadUpdate', async (oldThread, newThread) => {
+    if (!(await helpers.isLingeringThread(oldThread))) return;
+
+    let parentMessage = await oldThread.parent.messages.fetch(oldThread.id);
+    const lthreadJoinButton = new MessageActionRow()
+            .addComponents(
+                new MessageButton()
+                    .setCustomId('lingering_thread_join')
+                    .setLabel('Join thread')
+                    .setStyle('SUCCESS')
+                    .setEmoji('🧵')
+                    
+            );
+    if ( oldThread.locked && !newThread.locked ) {
+        if (!parentMessage.pinned) {
+            await parentMessage.pin().catch(console.error);
         }
-    } else {
-        return false;
-    }
-}
-
-/*client.on('threadUpdate', async (oldThread, newThread) => {
-    if (!(await isLingeringThread(oldThread))) return;
-
-    let parentMessage = await thread.parent.messages.fetch(thread.id);
-    if( newThread.locked ) {
-        const disbaledButton = new MessageButton()
-            .setCustomId('lingering_thread_join')
-            .setLabel('Join thread')
-            .setStyle('SUCCESS')
-            .setDisabled(true)
-            .setEmoji('🧵')
-
-        parentMessage.
+        lthreadJoinButton.components[0].setDisabled(false);
+        await parentMessage.edit({ components: [lthreadJoinButton]});
+        await parentMessage.edit(' ').catch(console.error);
+    } else if ( !oldThread.locked && newThread.locked ) {
+        if (parentMessage.pinned) {
+            await parentMessage.unpin().catch(console.error);
+        }
+        await parentMessage.edit('🔒 This thread is locked 🔒').catch(console.error);
+        lthreadJoinButton.components[0].setDisabled(true);
+        await parentMessage.edit({ components: [lthreadJoinButton]});
     }
 
-})*/
+})
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand() || !config.guilds[interaction.guild.id]) return;
