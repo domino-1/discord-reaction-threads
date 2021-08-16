@@ -277,16 +277,7 @@ client.on('interactionCreate', async interaction => {
 	if (!interaction.customId === 'lingering_thread_join') return;
     if (!interaction.message.hasThread) {
         await interaction.message.unpin().catch(console.error);
-        const lthreadJoinButton = new MessageActionRow()
-            .addComponents(
-                new MessageButton()
-                    .setCustomId('lingering_thread_join')
-                    .setLabel('Join thread')
-                    .setStyle('SUCCESS')
-                    .setEmoji('🧵')
-                    .setDisabled(true)
-            );
-        await interaction.update({ content: '⚠️ This thread was deleted ⚠️', components: [lthreadJoinButton] }).catch(console.error);
+        await interaction.update({ content: '⚠️ This thread was deleted ⚠️', components: [] }).catch(console.error);
         return;
     }
 
