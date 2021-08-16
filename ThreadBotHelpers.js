@@ -29,7 +29,12 @@ class ThreadBotHelpers {
 
         let oldPerms = await command.permissions.fetch()
             .catch(console.error);
-        if (oldPerms.length != permissions.length) {
+        if (oldPerms) {
+            if (oldPerms.length != permissions.length) {
+            await command.permissions.set({ permissions });
+            console.log("Perms updated");
+            }
+        } else {
             await command.permissions.set({ permissions });
             console.log("Perms updated");
         }
