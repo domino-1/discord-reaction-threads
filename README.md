@@ -48,16 +48,16 @@
 
 ## About
 
-ReactionThreads is a small discord bot, which expands upon Discord's Threads feature. The Bot's main use is to allow creation of threads via users reaction on a message. It listens for '🧵' reactions, and when a specific configurable number of them is reached, the bot creates a thread. (This number is set to 3 by default, but can be changed.) This means that more then one person has to show interest in a topic to create a thread, reducing the number of empty ones, and helping prevent clutter. 
+ReactionThreads is a small discord bot, which expands upon Discord's Threads feature. The Bot's main use is to allow creation of threads via users reaction on a message. It listens for '🧵' reactions, and when a specific configurable number of them is reached, the bot creates a thread. (This number is set to 3 by default, but can be changed.) This means that more than one person has to show interest in a topic to create a thread, reducing the number of empty ones, and helping prevent clutter. 
 The bot also comes with several other thread-related tools, such as a <code>/name</code> command for renaming new threads created by the bot. 
 
 #### Lingering Threads
 
-Lingering Threads are a feature of this bot which push threads in the direction of being 'sub-channels'. They can be created using the <code>/lthread create</code> command. This makes an embed message with a button for joining the thread, opens the thread up, and pins the message. The aim with this is getting a thread that open as long as it can be, and is as easy to access as possible. Once the thread automatically archives, the button can still be used by new people to unarchive and join it, while being pinned keeps it visible. Lockin (moderator-archiving) a Lingering Thread unpins and disables the join message, while deleting it removes the button altogether. 
+Lingering Threads are a feature of this bot, which push threads in the direction of being 'sub-channels'. They can be created using the <code>/lthread create</code> command. This makes an embed message with a button for joining the thread, opens the thread up, and pins the message. The aim with this is getting a thread that open as long as it can be, and is as easy to access as possible. Once the thread automatically archives, the button can still be used by new people to unarchive and join it, while being pinned keeps it visible. Locking (moderator-archiving) a Lingering Thread unpins and disables the join message, while deleting it removes the button altogether. 
 
 #### Configuration and Logging
 
-The ReactionThreads bot comes with configuration options (trough <code>/config basic ⧼options⧽</code> and optional logging (trought <code>/config logging ⧼options⧽</code>. 
+The ReactionThreads bot comes with configuration options (trough <code>/config basic ⧼options⧽</code>) and optional logging (trough <code>/config logging ⧼options⧽</code>). 
   
 Configurable options are: 
 * The number of reactions needed to open a thread
@@ -79,7 +79,7 @@ Logging options are:
 <!-- GETTING STARTED -->
 ## Self-hosting the bot
 
-To get a local copy up and running follow these simple steps.
+To get a local copy up and running, follow these simple steps.
 
 ### Prerequisites
 
