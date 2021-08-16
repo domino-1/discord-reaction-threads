@@ -236,7 +236,7 @@ client.on('messageCreate', async message => {
         console.log(command);
     }
 
-    if (message.content.toLowerCase() === '!undeploy guild' && message.author.id === client.application?.owner.id) {
+    if (message.content.toLowerCase() === '!unregister guild' && message.author.id === client.application?.owner.id) {
         (await message.guild.commands.fetch()).each(cmd => /*console.log(cmd)*/message.channel.guild.commands.delete(cmd.id));
     }
 
