@@ -66,7 +66,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                         newThread.members.add(user);
                     }))
                     .catch(console.error);
-                if ( logging ) {
+                if ( logChannel && logging ) {
                     await logChannel.send(`Thread ${newThread.id} created from the message "${reaction.message.content.slice(0, 15)}..." in the "#${reaction.message.channel.name}" channel.`).catch(console.error);
                 }
             })
@@ -100,6 +100,10 @@ client.on('messageCreate', async message => {
         {
             name: 'info',
             description: 'Provides information about the bot.'
+        },
+        {
+            name: 'setup',
+            description: 'Initial bot setup'
         },
         {
             name: 'lthread',
@@ -232,12 +236,16 @@ client.on('messageCreate', async message => {
         console.log(command);
     }
 
+    if (message.content.toLowerCase() === '!undeploy guild' && message.author.id === client.application?.owner.id) {
+        (await message.guild.commands.fetch()).each(cmd => /*console.log(cmd)*/message.channel.guild.commands.delete(cmd.id));
+    }
+
     if (message.content.toLowerCase() === '!deploy global' && message.author.id === client.application?.owner.id) {
         const commands = await client.application?.commands.set(data);
         console.log(commands);
     }
 
-    if (message.content.toLowerCase() === '!setup' && ( await message.member.permissions.has('MANAGE_GUILD') )) {
+    /*if (message.content.toLowerCase() === '!setup' && ( await message.member.permissions.has('MANAGE_GUILD') )) {
         //sets up config command permissions
         await helpers.setCommandPerms(message, 'config', 'MANAGE_GUILD');
         await helpers.setCommandPerms(message, 'lthread', 'MANAGE_GUILD');
@@ -256,13 +264,12 @@ client.on('messageCreate', async message => {
             fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
         }
         if (config.guilds[message.guild.id]) { 
-            setupComplete = true;
             message.channel.send({ content: 'Setup complete.'});
             console.log('Setup complete');
         } else {
             message.channel.send({ content: 'Something went wrong. Please try again. '})
         }
-    }
+    }*/
 });
 
 client.on('interactionCreate', async interaction => {
@@ -336,7 +343,7 @@ client.on('interactionCreate', async interaction => {
 
     try {
 		await client.commands.get(interaction.commandName).execute(interaction);
-        if ( interaction.commandName === 'config' ) {
+        if ( interaction.commandName === 'config' || interaction.commandName === 'setup' ) {
             config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
         }
 	} catch (error) {
