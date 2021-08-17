@@ -13,7 +13,12 @@ class ThreadBotHelpers {
     async setCommandPerms(context, target, permission) {
         let roles = [];
         let permissions = [];
-        let command = await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === `${target}`);
+        let command;
+        if (await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === `${target}`)) {
+            command = await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === `${target}`);
+        } else {
+            command = await (await context.guild.client.application?.commands.fetch().catch(console.error)).find(cmd => cmd.name === `${target}`);
+        }
         
         await this.getRolesByPermission(context.guild, roles, permission);
 
@@ -27,15 +32,15 @@ class ThreadBotHelpers {
             );
         });
 
-        let oldPerms = await command.permissions.fetch()
-            .catch(console.error);
+        let oldPerms = await command.permissions.fetch({guild: context.guild})
+                .catch(console.error);
         if (oldPerms) {
             if (oldPerms.length != permissions.length) {
-            await command.permissions.set({ permissions });
+            await command.permissions.set({ guild: context.guild, permissions: permissions });
             console.log("Perms updated");
-            }
+            }   
         } else {
-            await command.permissions.set({ permissions });
+            await command.permissions.set({ guild: context.guild, permissions: permissions });
             console.log("Perms updated");
         }
         
