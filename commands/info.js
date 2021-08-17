@@ -13,10 +13,10 @@ module.exports = {
             .setImage('https://cdn.discordapp.com/avatars/780452775070662686/5afd92e587f0daaa379ae35fb8691f1f.webp?size=256')
             .setTimestamp()
             .setDescription('ThreadBot is a discord bot meant allow for threads to be created based on the number of 🧵 reactions on a message.')
-            .addField('Commands:', `\n/name - Sets the name of a thread. This command can only be used by thread creators, and only withing the first 50 messages in a thread.
-            \n/setup - Initial bot setup command. This must be performed for the bot to work.
-            \n/info - General information and bot commands.
-            \n/config basic - Bot configuration options
+            .addField('General commands:', `\n/setup - Initial bot setup command. This must be performed for the bot to work.
+            \n/name - Sets the name of a thread. This command can only be used by thread creators, and only withing the first 50 messages in a thread.
+            \n/info - General information and bot commands.`, true)
+            .addField('Config command:', `\n/config basic - Bot configuration options
             * reactions - The number of reactions needed to open a thread
             * threadname - The default name for threads the bot opens
             * archivetime - The default archive time for threads the bot opens
