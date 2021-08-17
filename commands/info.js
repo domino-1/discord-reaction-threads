@@ -25,8 +25,8 @@ module.exports = {
             /config logging - Bot logging options
             * logging - The option to turn logging on and off
             * logchannel - A logchannel for the bot to send logging messages to 
-            Logging needs to be set to true, AND a logchannel needs to be specified for it to work!
-            \n/lthread create - Creates a Lingering Thread
+            Logging needs to be set to true, AND a logchannel needs to be specified for it to work!`, true)
+            .addField('Lingering Threads:',`\n/lthread create - Creates a Lingering Thread
             * name - The thread's name
             * description - The descriptiont text in the embed message
             /lthread edit - Edits an existing Lingering Thread (message and thread)
