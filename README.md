@@ -15,6 +15,8 @@
     <a href="https://github.com/domino-1/discord-reaction-threads/issues">Report Bug</a>
     ·
     <a href="https://github.com/domino-1/discord-reaction-threads/issues">Request Feature</a>
+    ·
+    <a href="https://discord.com/oauth2/authorize?client_id=780452775070662686&scope=bot+applications.commands&permissions=122473802816">Invite Bot</a>
   </p>
 </p>
 
