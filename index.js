@@ -244,32 +244,6 @@ client.on('messageCreate', async message => {
         const commands = await client.application?.commands.set(data);
         console.log(commands);
     }
-
-    /*if (message.content.toLowerCase() === '!setup' && ( await message.member.permissions.has('MANAGE_GUILD') )) {
-        //sets up config command permissions
-        await helpers.setCommandPerms(message, 'config', 'MANAGE_GUILD');
-        await helpers.setCommandPerms(message, 'lthread', 'MANAGE_GUILD');
-
-        //sets up config.json file with some defaults 
-        if (!config.guilds[message.guild.id]) {
-            config.guilds[message.guild.id] = {
-                "reactions": 3,
-                "archivetime": 60,
-                "logging": false,
-                "threadname": "New thread",
-                "threadnameNews": "Announcement thread",
-                "restrictNews": true
-            };
-
-            fs.writeFileSync('./config.json', JSON.stringify(config, null, 2));
-        }
-        if (config.guilds[message.guild.id]) { 
-            message.channel.send({ content: 'Setup complete.'});
-            console.log('Setup complete');
-        } else {
-            message.channel.send({ content: 'Something went wrong. Please try again. '})
-        }
-    }*/
 });
 
 client.on('interactionCreate', async interaction => {
