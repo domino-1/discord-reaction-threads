@@ -12,7 +12,13 @@ class ThreadBotHelpers {
 
     async setCommandPerms(context, target, permission) {
         let roles = [];
-        let permissions = [];
+        let permissions = [
+            {
+            id: `${context.guild.ownerId}`,
+            permission: true,
+            type: 'USER',
+            }
+        ];
         let command;
         if (await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === `${target}`)) {
             command = await (await context.guild.commands.fetch().catch(console.error)).find(cmd => cmd.name === `${target}`);
