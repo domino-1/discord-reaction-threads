@@ -6,11 +6,11 @@ module.exports = {
         const ThreadBotHelpers = require('../ThreadBotHelpers');
         const helpers = new ThreadBotHelpers();
         let config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
-        helpers.setCommandPerms(interaction, 'setup', 'MANAGE_GUILD');
+        helpers.setCommandPerms(interaction, 'setup', 'MANAGE_GUILD', 'global');
 
         //sets up config command permissions
-        await helpers.setCommandPerms(interaction, 'config', 'MANAGE_GUILD');
-        await helpers.setCommandPerms(interaction, 'lthread', 'MANAGE_GUILD');
+        helpers.setCommandPerms(interaction, 'config', 'MANAGE_GUILD');
+        helpers.setCommandPerms(interaction, 'lthread', 'MANAGE_GUILD');
 
         //sets up config.json file with some defaults 
         if (!config.guilds[interaction.guild.id]) {

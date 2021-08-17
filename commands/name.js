@@ -54,7 +54,7 @@ module.exports = {
                     .then(newThread => { 
                         interaction.reply({ content: `Thread name changed to '${interaction.channel.name}'.` })
                             .catch(console.error);
-                        if ( logChannel ) {
+                        if ( logChannel && logging ) {
                             logChannel.send(`Thread '${newThread.id}' name changed from "${oldThreadName}" to "${newThread.name}" by <@${interaction.user.id}>.`); 
                         }
                     })
