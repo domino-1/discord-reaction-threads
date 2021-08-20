@@ -26,7 +26,10 @@ client.once('ready', () => {
 });
 
 client.on('messageReactionAdd', async (reaction, user) => {
-    if (!config.guilds[reaction.message.guild.id]) return;
+    if (!config.guilds[reaction.message.guild.id]) {
+        reaction.message.reply({ content: 'Please do /setup to begin using ReactionThreads.', ephemeral: true});  
+        return;
+    }
 
     // When a reaction is received, check if the structure is partial
     if (reaction.partial) {
@@ -99,7 +102,7 @@ client.on('messageCreate', async message => {
         },
         {
             name: 'info',
-            description: 'Provides information about the bot.'
+            description: 'Provides information about ReactionThreads.'
         },
         {
             name: 'setup',
@@ -302,9 +305,12 @@ client.on('threadUpdate', async (oldThread, newThread) => {
 })
 
 client.on('interactionCreate', async interaction => {
-	if (!interaction.isCommand() || !config.guilds[interaction.guild.id]) return;
-
+	if (!interaction.isCommand()) return;
 	if (!client.commands.has(interaction.commandName)) return;
+    if (!config.guilds[interaction.guild.id] && interaction.commandName !== 'setup') {
+        interaction.reply({ content: 'Please do /setup to begin using ReactionThreads.', ephemeral: true});
+        return;
+    }
 
     try {
 		await client.commands.get(interaction.commandName).execute(interaction);
