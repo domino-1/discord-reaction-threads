@@ -111,7 +111,9 @@ To get a local copy up and running, follow these simple steps.
 
 #### General commands:
 /setup - Initial bot setup command. This must be performed for the bot to work.
+
 /name - Sets the name of a thread. This command can only be used by thread creators, and only withing the first 50 messages in a thread.
+
 /info - General information and bot commands.
 
 #### Config command:
@@ -121,15 +123,18 @@ To get a local copy up and running, follow these simple steps.
 · archivetime - The default archive time for threads the bot opens
 · newsthreadname - The default name for threads the bot opens from NEWS type channels (usually #announcements and the like)
 · restrictnews - The option to disabled thread creation via reactions in NEWS channels
+
 /config logging - Bot logging options
 · logging - The option to turn logging on and off
 · logchannel - A logchannel for the bot to send logging messages to
+
 Logging needs to be set to true, AND a logchannel needs to be specified for it to work!
 
 #### Lingering Threads:
 /lthread create - Creates a Lingering Thread
 · name - The thread's name
 · description - The descriptiont text in the embed message
+
 /lthread edit - Edits an existing Lingering Thread (message and thread)
 · thread - The Lingering Thread to edit. This does not need to be set if the command is done inside an lthread.
 · name - The Lingering Thread's new name.
